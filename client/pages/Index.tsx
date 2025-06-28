@@ -59,7 +59,7 @@ export default function Index() {
                 <Music className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-500 bg-clip-text text-transparent">
-                TubeConverter
+                SmuggyConverter
               </h1>
             </div>
             <Badge variant="secondary" className="hidden sm:flex">
