@@ -299,7 +299,7 @@ export default function Index() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600">
             <p className="mb-2">
-              © 2024 TubeConverter. Free YouTube to MP3 & MP4 converter.
+              © 2025 SmuggyConverter. Free YouTube to MP3 & MP4 converter.
             </p>
             <p className="text-sm">
               For personal use only. Please respect copyright laws and YouTube's
