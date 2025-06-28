@@ -26,13 +26,17 @@ import {
   Sparkles,
   Shield,
   Zap,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function Index() {
   const [url, setUrl] = useState("");
   const [quality, setQuality] = useState("320");
   const [format, setFormat] = useState("mp3");
   const [isConverting, setIsConverting] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const handleConvert = async () => {
     if (!url.trim()) return;
@@ -62,10 +66,22 @@ export default function Index() {
                 SmuggyConverter
               </h1>
             </div>
-            <Badge variant="secondary" className="hidden sm:flex">
-              <Sparkles className="w-3 h-3 mr-1" />
-              Free & Fast
-            </Badge>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                className="h-9 w-9"
+              >
+                <Moon className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Sun className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
+              <Badge variant="secondary" className="hidden sm:flex">
+                <Sparkles className="w-3 h-3 mr-1" />
+                Free & Fast
+              </Badge>
+            </div>
           </div>
         </div>
       </header>
