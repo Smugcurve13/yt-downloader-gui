@@ -53,9 +53,9 @@ export default function Index() {
   const isValidUrl = url.includes("youtube.com") || url.includes("youtu.be");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50 dark:bg-black/90 dark:border-gray-800">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -117,7 +117,7 @@ export default function Index() {
 
         {/* Main Converter */}
         <div className="max-w-4xl mx-auto">
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm dark:bg-black/90 dark:border-gray-800">
             <CardHeader>
               <CardTitle className="text-center">
                 Choose Your Conversion Type
@@ -311,7 +311,7 @@ export default function Index() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 mt-20">
+      <footer className="border-t bg-gray-50 mt-20 dark:bg-black dark:border-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600">
             <p className="mb-2">
