@@ -89,28 +89,36 @@ export default function Index() {
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Convert YouTube Videos
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <span className="text-gray-900 dark:text-white">
+              Convert YouTube Videos
+            </span>
             <span className="block text-red-500">to MP3 & MP4</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
             Download your favorite YouTube videos and playlists in high quality.
             Fast, free, and easy to use.
           </p>
 
           {/* Features */}
           <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <div className="flex items-center space-x-2 text-gray-600">
+            <div className="flex items-center space-x-2 text-gray-600 dark:text-white">
               <Zap className="w-4 h-4 text-red-500" />
-              <span className="text-sm">Lightning Fast</span>
+              <span className="text-sm text-gray-600 dark:text-white">
+                Lightning Fast
+              </span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600">
+            <div className="flex items-center space-x-2 text-gray-600 dark:text-white">
               <Shield className="w-4 h-4 text-red-500" />
-              <span className="text-sm">100% Safe</span>
+              <span className="text-sm text-gray-600 dark:text-white">
+                100% Safe
+              </span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600">
+            <div className="flex items-center space-x-2 text-gray-600 dark:text-white">
               <Download className="w-4 h-4 text-red-500" />
-              <span className="text-sm">No Registration</span>
+              <span className="text-sm text-gray-600 dark:text-white">
+                No Registration
+              </span>
             </div>
           </div>
         </div>
@@ -311,7 +319,7 @@ export default function Index() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 mt-20 dark:bg-black dark:border-gray-800">
+      <footer className="border-t bg-gray-50 mt-12 dark:bg-black dark:border-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600">
             <p className="mb-2">
