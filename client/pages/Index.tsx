@@ -183,7 +183,7 @@ export default function Index() {
             <span className="text-gray-900 dark:text-white">
               Convert YouTube Videos
             </span>
-            <span className="block text-red-500">to MP3 & MP4</span>
+            <span className="block text-red-500">to MP3</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
             Download your favorite YouTube videos and playlists in high quality.
@@ -312,12 +312,12 @@ export default function Index() {
                           <span>MP3 (Audio)</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="mp4">
+                      {/* <SelectItem value="mp4">
                         <div className="flex items-center space-x-2">
                           <Video className="w-4 h-4" />
                           <span>MP4 (Video)</span>
                         </div>
-                      </SelectItem>
+                      </SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>
@@ -459,7 +459,7 @@ export default function Index() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600">
             <p className="mb-2">
-              © 2025 SmuggyConverter. Free YouTube to MP3 & MP4 converter.
+              © 2025 SmuggyConverter. Free YouTube to MP3 converter.
             </p>
             <p className="text-sm">
               For personal use only. Please respect copyright laws and YouTube's
