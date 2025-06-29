@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,21 +36,111 @@ export default function Index() {
   const [quality, setQuality] = useState("320");
   const [format, setFormat] = useState("mp3");
   const [isConverting, setIsConverting] = useState(false);
+  const [tab, setTab] = useState("single");
+  const [error, setError] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [results, setResults] = useState<any[]>([]);
+  const [progress, setProgress] = useState<number>(0);
   const { theme, setTheme } = useTheme();
+
+  // Helper to reset state
+  const resetState = () => {
+    setError(null);
+    setDownloadUrl(null);
+    setJobId(null);
+    setResults([]);
+    setProgress(0);
+  };
+
+  // Polling for playlist/batch jobs
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (jobId) {
+      interval = setInterval(async () => {
+        try {
+          const res = await fetch(`http://localhost:8000/api/status/${jobId}`);
+          const data = await res.json();
+          setProgress(data.progress || 0);
+          if (data.results) setResults(data.results);
+          if (data.progress === 100 || data.status === "completed") {
+            clearInterval(interval);
+            setIsConverting(false);
+          }
+        } catch (e) {
+          setError("Failed to fetch job status.");
+          setIsConverting(false);
+          clearInterval(interval);
+        }
+      }, 2500);
+    }
+    return () => clearInterval(interval);
+  }, [jobId]);
 
   const handleConvert = async () => {
     if (!url.trim()) return;
-
+    resetState();
     setIsConverting(true);
-    // Simulate conversion process
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsConverting(false);
+    setError(null);
 
-    // In a real app, this would trigger the actual conversion
-    console.log("Converting:", { url, quality, format });
+    try {
+      if (tab === "single") {
+        const res = await fetch("http://localhost:8000/api/convert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, format, quality }),
+        });
+        const data = await res.json();
+        if (data.status === "success" && data.download_url) {
+          setDownloadUrl(`http://localhost:8000${data.download_url}`);
+        } else {
+          setError("Conversion failed. Please try again.");
+        }
+        setIsConverting(false);
+      } else if (tab === "playlist") {
+        const res = await fetch("http://localhost:8000/api/convert/playlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, format, quality }),
+        });
+        const data = await res.json();
+        if (data.job_id) {
+          setJobId(data.job_id);
+        } else {
+          setError("Failed to start playlist conversion.");
+          setIsConverting(false);
+        }
+      } else if (tab === "batch") {
+        // Split URLs by line, filter empty
+        const urls = url.split("\n").map((u) => u.trim()).filter(Boolean);
+        if (!urls.length) {
+          setError("Please enter at least one valid YouTube URL.");
+          setIsConverting(false);
+          return;
+        }
+        const res = await fetch("http://localhost:8000/api/convert/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ urls, format, quality }),
+        });
+        const data = await res.json();
+        if (data.job_id) {
+          setJobId(data.job_id);
+        } else {
+          setError("Failed to start batch conversion.");
+          setIsConverting(false);
+        }
+      }
+    } catch (e) {
+      setError("An error occurred. Please try again.");
+      setIsConverting(false);
+    }
   };
 
-  const isValidUrl = url.includes("youtube.com") || url.includes("youtu.be");
+  const isValidUrl =
+    tab === "batch"
+      ? url.split("\n").some((u) => u.includes("youtube.com") || u.includes("youtu.be"))
+      : url.includes("youtube.com") || url.includes("youtu.be");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50 dark:bg-gradient-to-br dark:from-black dark:via-black dark:to-black">
@@ -137,7 +227,7 @@ export default function Index() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Conversion Type Tabs */}
-              <Tabs defaultValue="single" className="w-full">
+              <Tabs defaultValue="single" className="w-full" value={tab} onValueChange={setTab}>
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger
                     value="single"
@@ -198,7 +288,7 @@ export default function Index() {
                     </Label>
                     <textarea
                       id="batch-urls"
-                      placeholder="https://www.youtube.com/watch?v=...&#10;https://www.youtube.com/watch?v=...&#10;https://www.youtube.com/watch?v=..."
+                      placeholder="https://www.youtube.com/watch?v=...\nhttps://www.youtube.com/watch?v=...\nhttps://www.youtube.com/watch?v=..."
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       className="w-full min-h-[100px] px-3 py-2 border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-md resize-none"
@@ -257,7 +347,7 @@ export default function Index() {
                 {isConverting ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Converting...</span>
+                    <span>{jobId ? (progress < 100 ? `Processing... (${progress}%)` : "Finishing...") : "Converting..."}</span>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
@@ -267,6 +357,52 @@ export default function Index() {
                 )}
               </Button>
 
+              {/* Error Message */}
+              {error && (
+                <p className="text-sm text-red-500 text-center">{error}</p>
+              )}
+
+              {/* Download Link for Single Video */}
+              {downloadUrl && tab === "single" && (
+                <div className="text-center mt-4">
+                  <a
+                    href={downloadUrl}
+                    className="inline-block px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 font-semibold"
+                    download
+                  >
+                    Download File
+                  </a>
+                </div>
+              )}
+
+              {/* Results for Playlist/Batch */}
+              {results.length > 0 && (tab === "playlist" || tab === "batch") && (
+                <div className="mt-6">
+                  <h3 className="font-semibold mb-2 text-center">Results</h3>
+                  <ul className="space-y-2">
+                    {results.map((r, i) => (
+                      <li key={i} className="flex flex-col md:flex-row md:items-center md:space-x-4 border p-2 rounded bg-gray-50 dark:bg-gray-900">
+                        <span className="truncate text-xs md:text-sm flex-1">{r.url}</span>
+                        {r.status === "success" && r.file_id ? (
+                          <a
+                            href={`http://localhost:8000/api/download/${r.file_id}`}
+                            className="mt-1 md:mt-0 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs font-semibold"
+                            download
+                          >
+                            Download
+                          </a>
+                        ) : r.status === "failed" ? (
+                          <span className="text-red-500 text-xs">Failed: {r.error || "Unknown error"}</span>
+                        ) : (
+                          <span className="text-gray-500 text-xs">Processing...</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Invalid URL Message */}
               {url && !isValidUrl && (
                 <p className="text-sm text-red-500 text-center">
                   Please enter a valid YouTube URL
